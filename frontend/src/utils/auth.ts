@@ -1,10 +1,11 @@
-// Simple auth helper to centralize localStorage access and emit events
+// Simple auth helper to centralize sessionStorage access and emit events
+// Using sessionStorage instead of localStorage for better security (token cleared on tab close)
 export function setAuth(token: string, username?: string) {
-  localStorage.setItem('token', token)
+  sessionStorage.setItem('token', token)
   if (username) {
-    localStorage.setItem('username', username)
+    sessionStorage.setItem('username', username)
   }
-  localStorage.setItem('isAuthenticated', 'true')
+  sessionStorage.setItem('isAuthenticated', 'true')
   try {
     window.dispatchEvent(new CustomEvent('authChanged'))
   } catch (e) {
@@ -13,22 +14,22 @@ export function setAuth(token: string, username?: string) {
 }
 
 export function clearAuth() {
-  localStorage.removeItem('token')
-  localStorage.removeItem('username')
-  localStorage.removeItem('isAuthenticated')
+  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('username')
+  sessionStorage.removeItem('isAuthenticated')
   try {
     window.dispatchEvent(new CustomEvent('authChanged'))
   } catch (e) {}
 }
 
 export function getToken(): string | null {
-  return localStorage.getItem('token')
+  return sessionStorage.getItem('token')
 }
 
 export function getUsername(): string | null {
-  return localStorage.getItem('username')
+  return sessionStorage.getItem('username')
 }
 
 export function isAuthenticated(): boolean {
-  return localStorage.getItem('isAuthenticated') === 'true'
+  return sessionStorage.getItem('isAuthenticated') === 'true'
 }

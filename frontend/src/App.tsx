@@ -44,6 +44,7 @@ function NavBar() {
   }, [])
 
   useEffect(() => {
+    // Handle storage events from other tabs/windows (sessionStorage events work across tabs)
     function handleStorage(e: StorageEvent) {
       if (e.key === 'token' || e.key === 'username' || e.key === 'isAuthenticated') {
         setToken(getToken())
@@ -51,6 +52,7 @@ function NavBar() {
       }
     }
 
+    // Handle auth changes in the same window (via custom event)
     function handleAuthChanged() {
       setToken(getToken())
       setUsername(getUsername())
