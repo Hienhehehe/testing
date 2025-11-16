@@ -1,33 +1,43 @@
+// cypress/e2e/pages/LoginPage.ts
 export class LoginPage {
   visit() {
     cy.visit("/login");
   }
 
-  getEmailInput() {
-    return cy.get('input[name="email"]');
+  emailInput() {
+    return cy.get('[data-test="login-email"]');       // chỉnh theo code của bạn
   }
 
-  getPasswordInput() {
-    return cy.get('input[name="password"]');
+  passwordInput() {
+    return cy.get('[data-test="login-password"]');
   }
 
-  getSubmitButton() {
-    return cy.get('button[type="submit"]');
+  submitButton() {
+    return cy.get('[data-test="login-submit"]');
   }
 
-  getErrorMessage() {
-    return cy.get('[data-test="login-error"]'); // tuỳ selector bạn đặt
+  rememberMeCheckbox() {
+    return cy.get('[data-test="login-remember"]');
   }
 
-  fillEmail(email: string) {
-    this.getEmailInput().clear().type(email);
+  showPasswordButton() {
+    return cy.get('[data-test="toggle-password"]');
   }
 
-  fillPassword(password: string) {
-    this.getPasswordInput().clear().type(password);
+  errorMessage() {
+    return cy.get('[data-test="login-error"]');
+  }
+
+  validationMessage(field: "email" | "password") {
+    return cy.get(`[data-test="login-${field}-error"]`);
+  }
+
+  fillForm(email: string, password: string) {
+    this.emailInput().clear().type(email);
+    this.passwordInput().clear().type(password);
   }
 
   submit() {
-    this.getSubmitButton().click();
+    this.submitButton().click();
   }
 }
