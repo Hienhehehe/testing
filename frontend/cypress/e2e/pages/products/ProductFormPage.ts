@@ -13,10 +13,6 @@ export class ProductFormPage {
     return cy.get('[data-test="product-quantity-input"]');
   }
 
-  descriptionInput() {
-    return cy.get('[data-test="product-description-input"]');
-  }
-
   submitButton() {
     return cy.get('[data-test="product-submit-button"]');
   }
@@ -33,7 +29,6 @@ export class ProductFormPage {
     name?: string;
     price?: string | number;
     quantity?: string | number;
-    description?: string;
   }) {
     if (data.name !== undefined) {
       this.nameInput().clear().type(String(data.name));
@@ -43,9 +38,6 @@ export class ProductFormPage {
     }
     if (data.quantity !== undefined) {
       this.quantityInput().clear().type(String(data.quantity));
-    }
-    if (data.description !== undefined) {
-      this.descriptionInput().clear().type(String(data.description));
     }
   }
 
