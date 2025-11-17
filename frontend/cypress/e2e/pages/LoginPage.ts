@@ -5,7 +5,7 @@ export class LoginPage {
   }
 
   emailInput() {
-    return cy.get('[data-test="login-email"]');       // chỉnh theo code của bạn
+    return cy.get('[data-text="login-username"]');       // chỉnh theo code của bạn
   }
 
   passwordInput() {

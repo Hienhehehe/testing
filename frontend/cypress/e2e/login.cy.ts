@@ -16,36 +16,32 @@ describe("E2E - Login flow", () => {
     });
   });
 
-  // a) Test complete login flow (1 điểm)
   it("a) Complete login flow with valid credentials", () => {
-    // Giả lập API login thành công (nếu bạn muốn dùng mock)
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 200,
       body: {
-        token: "fake-jwt-token",
-        user: { email: "user@test.com" },
+        token: "fake-jwt-token",  
+        userId: "9dc535e3-5565-4db1-9dda-560dabd8131a",
+        username: "lam123",
       },
     }).as("loginRequest");
 
-    loginPage.fillForm("user@test.com", "Password123");
-    loginPage.rememberMeCheckbox().check(); // ví dụ có ô remember me
+    loginPage.fillForm("lam123", "Password123"); 
     loginPage.submit();
 
-    // chờ API
     cy.wait("@loginRequest").its("response.statusCode").should("eq", 200);
 
-    // kiểm tra chuyển trang sau login
-    cy.url().should("include", "/home"); // hoặc /dashboard tuỳ app
+    cy.url().should("include", "/home");
 
-    // kiểm tra token được lưu (ví dụ lưu ở localStorage)
+    // kiểm tra token được lưu trong sessionStorage
     cy.window().then((w) => {
-      const token = w.localStorage.getItem("token");
+      const token = w.sessionStorage.getItem("token");
       expect(token).to.eq("fake-jwt-token");
-    });
+    })
 
-    // kiểm tra UI sau khi login
     cy.get("[data-test='home-welcome']").should("contain", "Chào mừng");
   });
+
 
   // b) Test validation messages (0.5 điểm)
   it("b1) Hiển thị lỗi khi để trống email & password", () => {

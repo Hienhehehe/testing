@@ -14,6 +14,6 @@ export function consumeRegisterSuccess(): string | null {
 export function parseLoginError(err: any): string {
   if (!err) return 'Không kết nối được tới server'
   if (typeof err === 'string') return err
-  if (err.message === 'Unauthorized') return 'Sai email hoặc mật khẩu'
+  if (err.message === 'Unauthorized') return 'tên đăng nhập hoặc mật khẩu không đúng'
   return err.message || 'Không kết nối được tới server'
 }
