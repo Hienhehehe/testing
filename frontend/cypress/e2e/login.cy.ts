@@ -68,13 +68,13 @@ describe("E2E - Login flow", () => {
   });
 
   it("b3) Hiển thị lỗi khi mật khẩu quá ngắn", () => {
-    loginPage.fillForm("user@test.com", "123");
+    loginPage.fillForm("admin1234", "123");
     loginPage.submit();
 
     loginPage
       .validationMessage("password")
       .should("be.visible")
-      .and("contain", "Mật khẩu tối thiểu");
+      .and("contain", "Mật khẩu phải từ 6 đến 100 ký tự");
   });
   
   it("b4) Hiển thị lỗi khi mật khẩu không đúng định dạng", () => {
@@ -84,9 +84,18 @@ describe("E2E - Login flow", () => {
     loginPage
       .validationMessage("password")
       .should("be.visible")
-      .and("contain", "Mật khẩu không đúng định dạng");
+      .and("contain", "Mật khẩu phải chứa cả chữ và số");
   });
 
+  it("b5) Hiển thị lỗi khi mật khẩu quá dài", () => {
+    loginPage.fillForm("admin1234", "a".repeat(101));
+    loginPage.submit();
+
+    loginPage
+      .validationMessage("password")
+      .should("be.visible")
+      .and("contain", "Mật khẩu phải từ 6 đến 100 ký tự");
+  });
   it("c1) Login thành công", () => {
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 200,
