@@ -47,7 +47,6 @@ function Home() {
           {username ? `, ${username}` : ''}
         </p>
 
-        {/* Chỉ hiện Đăng nhập / Đăng ký khi CHƯA đăng nhập */}
         {!token && (
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link

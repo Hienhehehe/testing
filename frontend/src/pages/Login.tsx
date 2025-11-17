@@ -3,12 +3,15 @@ import { Link, useNavigate } from 'react-router-dom'
 import { setAuth } from '../utils/auth'
 import { login as apiLogin } from '../services/authService'
 import { consumeRegisterSuccess, parseLoginError } from '../utils/loginUtils'
+import { validateLoginForm } from '../utils/loginValidation'
 
 export default function Login() {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const navigate = useNavigate()
@@ -21,6 +24,21 @@ export default function Login() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
+    setUsernameError(null)
+    setPasswordError(null)
+
+    const { usernameError: uError, passwordError: pError } = validateLoginForm(
+      username,
+      password,
+    )
+
+    setUsernameError(uError)
+    setPasswordError(pError)
+
+    if (uError || pError) {
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -58,7 +76,10 @@ export default function Login() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-start gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-3 py-2.5 text-sm text-red-200">
+            <div
+              className="flex items-start gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-3 py-2.5 text-sm text-red-200"
+              data-text="login-error"
+            >
               <span className="mt-0.5 text-lg">!</span>
               <span>{error}</span>
             </div>
@@ -74,11 +95,18 @@ export default function Login() {
                 data-text="login-username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
                 placeholder="Tên đăng nhập"
                 // autoComplete="username"
                 className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
               />
+              {usernameError && (
+                <p
+                  data-text="login-username-error"
+                  className="mt-1 text-xs text-red-300"
+                >
+                  {usernameError}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -94,7 +122,6 @@ export default function Login() {
                   data-text="login-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                   autoComplete="current-password"
                   className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
                   placeholder="••••••••"
@@ -107,6 +134,14 @@ export default function Login() {
                   {showPassword ? 'Hide' : 'Show'}
                 </p>
               </div>
+              {passwordError && (
+                <p
+                  data-text="login-password-error"
+                  className="mt-1 text-xs text-red-300"
+                >
+                  {passwordError}
+                </p>
+              )}
             </div>
 
             <button

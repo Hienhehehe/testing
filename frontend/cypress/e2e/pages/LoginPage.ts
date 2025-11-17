@@ -28,7 +28,7 @@ export class LoginPage {
     return cy.get('[data-text="login-error"]');
   }
 
-  validationMessage(field: "email" | "password") {
+  validationMessage(field: "username" | "password") {
     return cy.get(`[data-text="login-${field}-error"]`);
   }
 

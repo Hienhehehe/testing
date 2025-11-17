@@ -1,10 +1,10 @@
 export class HomePage {
   getWelcomeText() {
-    return cy.get("[data-test='home-welcome']");
+    return cy.get("[data-text='home-welcome']");
   }
 
   getLogoutButton() {
-    return cy.get("[data-test='logout-button']");
+    return cy.get("[data-text='logout-button']");
   }
 
   clickLogout() {

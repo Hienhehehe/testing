@@ -31,7 +31,7 @@ describe("E2E - Login flow", () => {
 
     cy.wait("@loginRequest").its("response.statusCode").should("eq", 200);
 
-    cy.url().should("include", "/home");
+    cy.url().should("include", "/products");
 
     // kiểm tra token được lưu trong sessionStorage
     cy.window().then((w) => {
@@ -39,7 +39,7 @@ describe("E2E - Login flow", () => {
       expect(token).to.eq("fake-jwt-token");
     })
 
-    cy.get("[data-test='home-welcome']").should("contain", "Chào mừng");
+    cy.contains("Danh sách sản phẩm").should("be.visible");
   });
 
 
@@ -48,23 +48,23 @@ describe("E2E - Login flow", () => {
     loginPage.submit();
 
     loginPage
-      .validationMessage("email")
+      .validationMessage("username")
       .should("be.visible")
-      .and("contain", "Email là bắt buộc");
+      .and("contain", "Tên đăng nhập không được để trống");
     loginPage
       .validationMessage("password")
       .should("be.visible")
       .and("contain", "Mật khẩu là bắt buộc");
   });
 
-  it("b2) Hiển thị lỗi khi email không hợp lệ", () => {
+  it("b2) Hiển thị lỗi khi tên đăng nhập không hợp lệ", () => {
     loginPage.fillForm("sai-dinh-dang", "Password123");
     loginPage.submit();
 
     loginPage
-      .validationMessage("email")
+      .validationMessage("username")
       .should("be.visible")
-      .and("contain", "Email không hợp lệ");
+      .and("contain", "tên đăng nhập không hợp lệ");
   });
 
   it("b3) Hiển thị lỗi khi mật khẩu quá ngắn", () => {
@@ -76,28 +76,41 @@ describe("E2E - Login flow", () => {
       .should("be.visible")
       .and("contain", "Mật khẩu tối thiểu");
   });
+  
+  it("b4) Hiển thị lỗi khi mật khẩu không đúng định dạng", () => {
+    loginPage.fillForm("lam123", "123...");
+    loginPage.submit();
 
-  // c) Test success/error flows (0.5 điểm)
+    loginPage
+      .validationMessage("password")
+      .should("be.visible")
+      .and("contain", "Mật khẩu không đúng định dạng");
+  });
+
   it("c1) Login thành công", () => {
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 200,
-      body: { token: "success-token" },
+      body: {
+        token: "fake-jwt-token",  
+        userId: "9dc535e3-5565-4db1-9dda-560dabd8131a",
+        username: "lam123",
+      },
     }).as("loginSuccess");
 
-    loginPage.fillForm("user@test.com", "Password123");
+    loginPage.fillForm("lam123", "Password123");
     loginPage.submit();
 
     cy.wait("@loginSuccess");
-    cy.url().should("include", "/home");
+    cy.url().should("include", "/products");
   });
 
   it("c2) Login sai mật khẩu -> hiển thị thông báo lỗi", () => {
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 401,
-      body: { message: "Email hoặc mật khẩu không đúng" },
+      body: { message: "Invalid username or password" },
     }).as("loginError");
 
-    loginPage.fillForm("user@test.com", "wrong-pass");
+    loginPage.fillForm("lam123", "Wrongpass1");
     loginPage.submit();
 
     cy.wait("@loginError");
@@ -105,8 +118,9 @@ describe("E2E - Login flow", () => {
     loginPage
       .errorMessage()
       .should("be.visible")
-      .and("contain", "Email hoặc mật khẩu không đúng");
+      .and("contain", "tên đăng nhập hoặc mật khẩu không đúng");
   });
+
 
   // d) Test UI elements interactions (0.5 điểm)
   it("d1) Nút show/hide password hoạt động đúng", () => {
@@ -124,33 +138,17 @@ describe("E2E - Login flow", () => {
     loginPage.passwordInput().should("have.attr", "type", "password");
   });
 
-  it("d2) Remember me ảnh hưởng nơi lưu token", () => {
-    // khi tick remember -> lưu localStorage
-    cy.intercept("POST", "**/api/auth/login", {
-      statusCode: 200,
-      body: { token: "remember-token" },
-    }).as("loginRemember");
-
-    loginPage.fillForm("user@test.com", "Password123");
-    loginPage.rememberMeCheckbox().check();
-    loginPage.submit();
-
-    cy.wait("@loginRemember");
-
-    cy.window().then((w) => {
-      expect(w.localStorage.getItem("token")).to.eq("remember-token");
-      expect(w.sessionStorage.getItem("token")).to.be.null;
-    });
-  });
-
   it("d3) Button bị disable khi đang submit", () => {
     cy.intercept("POST", "**/api/auth/login", (req) => {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve({ status : 200, body: { token: "t" } }), 1500);
+      req.reply({
+        statusCode: 200,
+        delay: 1500,
+        body: { token: "t", userId: "id", username: "lam123" },
       });
     }).as("slowLogin");
 
-    loginPage.fillForm("user@test.com", "Password123");
+    // Username & password phải hợp lệ để qua được client validation
+    loginPage.fillForm("lam123", "Password123");
     loginPage.submit();
 
     loginPage.submitButton().should("be.disabled");
