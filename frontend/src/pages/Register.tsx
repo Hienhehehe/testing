@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { register as apiRegister } from '../services/authService'
+import { sanitizeUsername, validateRegistrationInput, markRegisterSuccess } from '../utils/registerUtils'
 
 export default function Register() {
 	const [username, setUsername] = useState<string>('')
@@ -14,20 +15,19 @@ export default function Register() {
 		e.preventDefault()
 		setError(null)
 
-		if (password.length < 6) {
-			setError('Mật khẩu phải có ít nhất 6 ký tự')
-			return
-		}
-		if (password !== confirm) {
-			setError('Mật khẩu xác nhận không khớp')
+		const validation = validateRegistrationInput(username, password, confirm)
+		if (!validation.valid) {
+			setError(validation.error || 'Dữ liệu không hợp lệ')
 			return
 		}
 
 		setLoading(true)
 		try {
-			await apiRegister(username, password)
-			// service returns server message on success; keep a flag for login page
-			localStorage.setItem('registerSuccess', 'true')
+			// sanitize username before sending
+			const sanitized = sanitizeUsername(username)
+			await apiRegister(sanitized, password)
+			// mark success and redirect to login
+			markRegisterSuccess()
 			navigate('/login')
 		} catch (err: any) {
 			console.error(err)
