@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "test:e2e": "cypress open",
-    "test:e2e:ci": "cypress run --spec 'cypress/e2e/login.cy.ts' --reporter junit --reporter-options mochaFile=reports/junit-login.xml,toConsole=true"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.81.1",

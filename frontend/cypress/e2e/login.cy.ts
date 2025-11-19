@@ -44,7 +44,7 @@ describe("E2E - Login flow", () => {
 
 
   // b) Test validation messages (0.5 điểm)
-  it("b1) Hiển thị lỗi khi để trống email & password", () => {
+  it("b1) Hiển thị lỗi khi để trống tên đăng nhập và mật khẩu", () => {
     loginPage.submit();
 
     loginPage
